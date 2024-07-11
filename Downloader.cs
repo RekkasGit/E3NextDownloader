@@ -35,8 +35,8 @@ namespace E3NextDownloader
 		{
 			var dialog = new CommonOpenFileDialog();
 			dialog.IsFolderPicker = true;
-			
-			using(new CenterWinDialog(this))
+
+			using (new CenterWinDialog(this))
 			{
 				CommonFileDialogResult result = dialog.ShowDialog();
 				if (result == CommonFileDialogResult.Ok)
@@ -46,6 +46,66 @@ namespace E3NextDownloader
 				}
 			}
 		}
+		private void buttonDownload_Click(object sender, EventArgs e)
+		{
+
+			if (String.IsNullOrWhiteSpace(_extractionPath))
+			{
+				using (new CenterWinDialog(this))
+				{
+					MessageBox.Show("Please select a folder.");
+				}
+
+				return;
+			}
+			if (EQGameInFolder(_extractionPath))
+			{
+				using (new CenterWinDialog(this))
+				{
+					MessageBox.Show("Do not chose your EQ game folder. Please select another folder");
+				}
+				return;
+			}
+
+			if (FilesInFolder(_extractionPath))
+			{
+				using (new CenterWinDialog(this))
+				{
+					if (MessageBox.Show(this, "Files exist in this directory do you wish to overwrite them? Generally better to go to a new folder.", "Overwrite files?", MessageBoxButtons.OKCancel) != DialogResult.OK)
+					{
+						return;
+					}
+				}
+			}
+			
+			if (radioButtonEMU.Checked)
+			{
+				buttonDownload.Enabled = false;
+				_downloadTask = Task.Run(() => DownloadEMU());
+				return;
+			}
+			else if (radioButtonLive.Checked)
+			{
+
+				string mqLiveVersion = GetMQLiveVersion();
+				string mq2MonoLiveVersion = GetMQ2MonoLiveVersion();
+				if(String.Compare(mqLiveVersion,mq2MonoLiveVersion, StringComparison.OrdinalIgnoreCase)!=0)
+				{
+					using (new CenterWinDialog(this))
+					{
+						if (MessageBox.Show(this, "MQ2Mono Live version doesn't match MQ Live version, MQ2Mono May fail to load. Continue?", "Continue?", MessageBoxButtons.OKCancel) != DialogResult.OK)
+						{
+							return;
+						}
+					}
+				}
+				buttonDownload.Enabled = false;
+				_downloadTask = Task.Run(() => DownloadLive());
+				return;
+			}
+			buttonDownload.Enabled = true;
+		}
+
 
 		private void DownloadFile(string url, string filename, string topic)
 		{
@@ -66,11 +126,11 @@ namespace E3NextDownloader
 		private bool FilesInFolder(string path)
 		{
 			DirectoryInfo dirInfo = new DirectoryInfo(path);
-			if(dirInfo.Exists ) {
+			if (dirInfo.Exists) {
 
 				var files = dirInfo.GetFiles();
 
-				if(files.Length > 0 )
+				if (files.Length > 0)
 				{
 					return true;
 				}
@@ -88,20 +148,50 @@ namespace E3NextDownloader
 
 				if (files.Length > 0)
 				{
-				
-					foreach(var file in files)
+
+					foreach (var file in files)
 					{
-						if (String.Compare(file.Name,"eqgame.exe", true)==0)
+						if (String.Compare(file.Name, "eqgame.exe", true) == 0)
 						{
 							return true;
 						}
 					}
-				
+
 				}
 			}
 
 			return false;
 		}
+
+		private string GetMQLiveVersion()
+		{
+			GitHubClient gitclient = new GitHubClient(new ProductHeaderValue("E3NextDownloader"));
+			var releases = gitclient.Repository.Release.GetAll("macroquest", "macroquest");
+			releases.Wait();
+			var latest = releases.Result.Where(x => x.TagName == "rel-live").First();
+			
+			if (latest != null)
+			{
+				return latest.Name;
+			}
+
+			return string.Empty;
+		}
+		private string GetMQ2MonoLiveVersion()
+		{
+			GitHubClient gitclient = new GitHubClient(new ProductHeaderValue("E3NextDownloader"));
+			var releases = gitclient.Repository.Release.GetAll("RekkasGit", "MQ2Mono");
+			releases.Wait();
+			var latest = releases.Result.Where(x => x.TagName == "re-live").First();
+
+			if (latest != null)
+			{
+				return latest.Name.Replace("MQ2Mono for ","");
+			}
+
+			return string.Empty;
+		}
+	
 		private void DownloadEMU()
 		{
 
@@ -457,54 +547,7 @@ namespace E3NextDownloader
 			try { File.Delete(downloadLocation); } catch (Exception) { }
 			return true;
 		}
-		private void buttonDownload_Click(object sender, EventArgs e)
-		{
 		
-			if (String.IsNullOrWhiteSpace(_extractionPath))
-			{
-				using(new CenterWinDialog(this))
-				{
-					MessageBox.Show("Please select a folder.");
-				}
-				
-				return;
-			}
-			
-			if(EQGameInFolder(_extractionPath))
-			{
-				using (new CenterWinDialog(this))
-				{
-					MessageBox.Show("Do not chose your EQ game folder. Please select another folder");
-				}
-				return;
-			}
-
-			if (FilesInFolder(_extractionPath) )
-			{
-				using (new CenterWinDialog(this))
-				{
-					if (MessageBox.Show(this, "Files exist in this directory do you wish to overwrite them? Generally better to go to a new folder.", "Overwrite files?", MessageBoxButtons.OKCancel) != DialogResult.OK)
-					{
-						return;
-					}
-				}
-			}
-
-
-			buttonDownload.Enabled = false;
-			if (radioButtonEMU.Checked)
-			{
-				_downloadTask = Task.Run(() => DownloadEMU());
-				return;
-			}
-			else if(radioButtonLive.Checked)
-			{
-				_downloadTask = Task.Run(() => DownloadLive());
-				return;
-			}
-			buttonDownload.Enabled = true;
-		}
-
 		private void Downloader_Load(object sender, EventArgs e)
 		{
 			try
