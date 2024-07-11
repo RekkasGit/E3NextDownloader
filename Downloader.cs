@@ -151,7 +151,7 @@ namespace E3NextDownloader
 
 					foreach (var file in files)
 					{
-						if (String.Compare(file.Name, "eqgame.exe", true) == 0)
+						if (file.Name.IndexOf("eqgame.exe",0,StringComparison.OrdinalIgnoreCase)>-1)
 						{
 							return true;
 						}
