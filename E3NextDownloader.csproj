@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="util\CenterWinDialog.cs" />
     <Compile Include="util\HttpClientDownloadWithProgress.cs" />
     <EmbeddedResource Include="Downloader.resx">
       <DependentUpon>Downloader.cs</DependentUpon>
