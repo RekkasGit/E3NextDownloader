@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using E3NextLauncher.util;
@@ -556,7 +549,6 @@ namespace E3NextDownloader
 				{
 					_e3nImageBytes = new byte[filestream.Length];
 					filestream.Read(_e3nImageBytes, 0, (Int32)filestream.Length);
-					//do stuff 
 				}
 
 				using (var stream = new MemoryStream(_e3nImageBytes))
