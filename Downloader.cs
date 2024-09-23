@@ -241,6 +241,10 @@ namespace E3NextDownloader
 					{
 						e.Extract(_extractionPath, ExtractExistingFileAction.DoNotOverwrite);
 					}
+					else if (e.FileName.IndexOf("resources/", 0, StringComparison.OrdinalIgnoreCase) > -1)
+					{
+						e.Extract(_extractionPath, ExtractExistingFileAction.DoNotOverwrite);
+					}
 					else
 					{
 						e.Extract(_extractionPath, ExtractExistingFileAction.OverwriteSilently);
@@ -444,7 +448,7 @@ namespace E3NextDownloader
 						{
 							this.labelStatus.Text = $"Extracting {e.FileName}";
 						});
-						e.Extract(_extractionPath, ExtractExistingFileAction.OverwriteSilently);
+						e.Extract(_extractionPath, ExtractExistingFileAction.DoNotOverwrite);
 					}
 
 
