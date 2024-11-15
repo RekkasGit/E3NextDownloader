@@ -387,7 +387,7 @@ namespace E3NextDownloader
 			var downloadURL = zipFile.BrowserDownloadUrl;
 
 			DownloadFile(downloadURL, downloadLocation, "MQ2Mono.");
-
+			System.Threading.Thread.Sleep(1000);
 			using (ZipFile zip = ZipFile.Read(downloadLocation))
 			{
 
@@ -406,7 +406,6 @@ namespace E3NextDownloader
 					e.Extract(_extractionPath + @"\plugins\", ExtractExistingFileAction.OverwriteSilently);
 				}
 
-
 			}
 			try { File.Delete(downloadLocation); } catch (Exception) { }
 			return true;
@@ -422,7 +421,7 @@ namespace E3NextDownloader
 				var downloadURL = @"https://github.com/RekkasGit/MQ2Mono-Framework64/archive/refs/heads/main.zip";
 
 				DownloadFile(downloadURL, downloadLocation, "Mono Framework x64.");
-
+				System.Threading.Thread.Sleep(1000);
 				using (ZipFile zip = ZipFile.Read(downloadLocation))
 				{
 
@@ -494,6 +493,7 @@ namespace E3NextDownloader
 				});
 				return false;
 			}
+			System.Threading.Thread.Sleep(1000);
 			using (ZipFile zip = ZipFile.Read(downloadLocation))
 			{
 
@@ -509,19 +509,20 @@ namespace E3NextDownloader
 					{
 						this.labelStatus.Text = $"Extracting {e.FileName}";
 					});
-					if (e.FileName == @"e3/config.zip")
+					if (e.FileName == @"config.zip")
 					{
 						e.FileName = "config.zip";
 						e.Extract(_extractionPath);
 					}
 					else
 					{
-						e.Extract(_extractionPath + @"\mono\macros\", ExtractExistingFileAction.OverwriteSilently);
+						e.Extract(_extractionPath + @"\mono\macros\e3\", ExtractExistingFileAction.OverwriteSilently);
 
 					}
 				}
 				
 			}
+			System.Threading.Thread.Sleep(1000);
 			using (ZipFile zip = ZipFile.Read(_extractionPath + @"\config.zip"))
 			{
 
